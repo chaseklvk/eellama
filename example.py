@@ -61,7 +61,7 @@ def main(
         "Hello, I am",
     ]
     results = generator.generate(
-        prompts, max_gen_len=50, temperature=temperature, top_p=top_p
+        prompts, max_gen_len=10, temperature=temperature, top_p=top_p
     )
 
     for result in results:
