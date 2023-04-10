@@ -56,15 +56,15 @@ def apply_rotary_emb(
     freqs_cis: torch.Tensor,
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     xq_shape_new = (xq.shape[0], xq.shape[1], xq.shape[2], -1, 2)
-    xq_ = torch.view_as_complex(xq.float().reshape(xq_shape_new).to("cpu"))
+    xq_ = torch.view_as_complex(xq.float().reshape(xq_shape_new))#.to("cpu"))
     
     xk_shape_new = (xk.shape[0], xk.shape[1], xk.shape[2], -1, 2)
-    xk_ = torch.view_as_complex(xk.float().reshape(xk_shape_new).to("cpu"))
+    xk_ = torch.view_as_complex(xk.float().reshape(xk_shape_new))#.to("cpu"))
 
-    freqs_cis = reshape_for_broadcast(freqs_cis, xq_).to("cpu")
+    freqs_cis = reshape_for_broadcast(freqs_cis, xq_)#.to("cpu")
 
-    xq_out = torch.view_as_real(xq_ * freqs_cis).to("mps").flatten(3)
-    xk_out = torch.view_as_real(xk_ * freqs_cis).to("mps").flatten(3)
+    xq_out = torch.view_as_real(xq_ * freqs_cis).flatten(3)#.to("mps")
+    xk_out = torch.view_as_real(xk_ * freqs_cis).flatten(3)#.to("mps")
     return xq_out.type_as(xq), xk_out.type_as(xk)
 
 
@@ -83,10 +83,10 @@ class Attention(nn.Module):
 
         self.cache_k = torch.zeros(
             (args.max_batch_size, args.max_seq_len, self.n_local_heads, self.head_dim)
-        ).to("mps")
+        )#.to("mps")
         self.cache_v = torch.zeros(
             (args.max_batch_size, args.max_seq_len, self.n_local_heads, self.head_dim)
-        ).to("mps")
+        )#.to("mps")
 
     def forward(self, x: torch.Tensor, start_pos: int, freqs_cis: torch.Tensor, mask: Optional[torch.Tensor]):
         bsz, seqlen, _ = x.shape
@@ -195,7 +195,7 @@ class TailTransformer(nn.Module):
         mask = torch.full((1, 1, seqlen, seqlen), float("-inf"), device=h.device)
         # Need to do triu on CPU because otherwise the lower triangle is replaced with
         # NaN, not zero.
-        mask = torch.triu(mask.to("cpu"), diagonal=start_pos + 1).to("mps")
+        mask = torch.triu(mask.to("cpu"), diagonal=start_pos + 1)#.to("mps")
         ### END Precompute
         
         for layer in self.layers:
@@ -238,7 +238,7 @@ class HeadTransformer(nn.Module):
         mask = torch.full((1, 1, seqlen, seqlen), float("-inf"), device=x.device)
         # Need to do triu on CPU because otherwise the lower triangle is replaced with
         # NaN, not zero.
-        mask = torch.triu(mask.to("cpu"), diagonal=start_pos + 1).to("mps")
+        mask = torch.triu(mask.to("cpu"), diagonal=start_pos + 1)#.to("mps")
         ### END Precompute
         
         for layer in self.layers:

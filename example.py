@@ -18,7 +18,7 @@ def load(
 	start_time = time.time()
 
 	print("Loading")
-	checkpoint = torch.load(ckpt_path, map_location="mps")
+	checkpoint = torch.load(ckpt_path)#, map_location="mps")
 	tokenizer = Tokenizer(model_path=tokenizer_path)
 
 	head_args: ModelArgs = ModelArgs(
@@ -38,7 +38,7 @@ def load(
 	model.load_state_dict(checkpoint, strict=False)
 
 	generator = LLaMA(model, tokenizer)
-	generator.model.to("mps")
+	generator.model#.to("mps")
 	generator.model.eval()
 	print(f"Loaded in {time.time() - start_time:.2f} seconds")
 	return generator
