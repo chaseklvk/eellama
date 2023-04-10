@@ -31,6 +31,8 @@ def load(
 		norm_eps=1e-06,
 		vocab_size=tokenizer.n_words,
 	)
+
+	torch.set_default_tensor_type(torch.HalfTensor)
 	
 	model = HeadTransformer(head_args)
 	model.load_state_dict(checkpoint, strict=False)
